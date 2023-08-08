@@ -7,12 +7,12 @@ resource "aws_ecs_cluster" "my_cluster" {
 }
 
 resource "aws_ecs_task_definition" "my_task" {
-  family                   = "my-ecs-task"
-  network_mode            = "awsvpc"
+  family                   = "xpay-checkout-back-prd"
+  network_mode            = "bridge"
 
-  container_definitions = jsonencode([{
-    name  = "my-container"
-    image = "nginx:latest"
+  container_definitions = xpay-checkout([{
+    name  = "xpay-checkout"
+    image = "990921911254.dkr.ecr.us-east-1.amazonaws.com/xpay-checkout-prd"
     portMappings = [{
       containerPort = 80
       hostPort      = 80
@@ -21,15 +21,15 @@ resource "aws_ecs_task_definition" "my_task" {
 }
 
 resource "aws_lb" "my_lb" {
-  name               = "my-load-balancer"
+  name               = "xpay-checkout-back-prd_lb"
   internal           = false
   load_balancer_type = "application"
-  security_groups   = [aws_security_group.my_sg.id]
+  security_groups   = [aws_security_group.xpay_sg.id]
   subnets            = ["subnet-12345678", "subnet-23456789"]  # Change these to your subnet IDs
 }
 
-resource "aws_security_group" "my_sg" {
-  name_prefix = "my-sg-"
+resource "aws_security_group" "xpay_sg" {
+  name_prefix = "sg-07e9824cfe6a5dc39"
 }
 
 resource "aws_lb_target_group" "my_target_group" {
@@ -45,8 +45,6 @@ resource "aws_lb_listener" "my_listener" {
   default_action {
     type             = "fixed-response"
     status_code      = "200"
-    content_type     = "text/plain"
-    content          = "Hello, world!"
   }
 }
 
